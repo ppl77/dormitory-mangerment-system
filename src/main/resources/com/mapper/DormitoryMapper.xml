@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.DormitoryMapper">
+
+    <resultMap id="dormitoryResultMap" type="dormitory">
+        <result property="dormitoryId" column="dormitory_id"/>
+        <result property="dormitoryName" column="dormitory_name"/>
+        <result property="startDate" column="start_date"/>
+    </resultMap>
+
+    <update id="update">
+        update tb_dormitories
+        set
+            dormitory_name = #{dormitoryName},
+            floors = #{floors},
+            rooms = #{rooms},
+            start_date = #{startDate}
+        where
+            dormitory_id = #{dormitoryId};
+    </update>
+
+    <delete id="deleteByIds" >
+        delete from tb_dormitories where dormitory_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectByPageAndCondition" resultMap="dormitoryResultMap">
+        select *
+        from tb_dormitories
+        <where>
+            <if test="dormitory.dormitoryName != null and dormitory.dormitoryName != '' ">
+                and dormitory_name like #{dormitory.dormitoryName}
+            </if>
+            <if test="dormitory.floors != null">
+                and floors = #{dormitory.floors}
+            </if>
+            <if test="dormitory.rooms != null">
+                and rooms = #{dormitory.rooms}
+            </if>
+            <if test="dormitory.startDate != null and dormitory.startDate != '' ">
+                and start_date like #{dormitory.startDate}
+            </if>
+        </where>
+        limit #{begin}, #{size}
+    </select>
+
+    <select id="selectTotalCountByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from tb_dormitories
+        <where>
+            <if test="dormitoryName != null and dormitoryName != '' ">
+                and dormitory_name like #{dormitoryName}
+            </if>
+            <if test="floors != null">
+                and floors = #{floors}
+            </if>
+            <if test="rooms != null">
+                and rooms = #{rooms}
+            </if>
+            <if test="startDate != null and startDate !='' ">
+                and start_date like #{startDate}
+            </if>
+        </where>
+    </select>
+
+</mapper>

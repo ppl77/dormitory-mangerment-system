@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <!-- 顶部栏 -->
+    <div class="header">
+        <div class="logo-title">
+            <img src="images/logo.png" alt="Logo" class="logo">
+            <span class="title">统一身份认证</span>
+        </div>
+        <div class="header-right">
+            <span>{{ currentDateTime }}</span>
+        </div>
+    </div>
+
+    <!-- 登录表单 -->
+    <el-form :model="user" :rules="rules" ref="loginForm" label-width="100px" class="login-form">
+        <h2>登录</h2>
+        <el-form-item label="用户名" prop="username">
+            <el-input v-model="user.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+            <el-input v-model="user.password" type="password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="onLogin">登录</el-button>
+<!--            <el-button type="text" @click="onRegister">注册</el-button>-->
+        </el-form-item>
+    </el-form>
+</div>
+
+<script src="js/vue.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                user: {
+                    username: '',
+                    password: ''
+                },
+                rules: {
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' },
+                        { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入密码', trigger: 'blur' },
+                        { min: 6, message: '密码长度至少为 6 个字符', trigger: 'blur' }
+                    ]
+                },
+                currentDateTime: ''
+            };
+        },
+        created() {
+            this.updateDateTime();
+            setInterval(this.updateDateTime, 1000);
+        },
+        methods: {
+            updateDateTime() {
+                const date = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                this.currentDateTime = date.toLocaleDateString('zh-CN', options);
+            },
+            onLogin() {
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        axios({
+                            method: "post",
+                            url: "http://localhost:9999/dams-war/loginServlet",
+                            data: this.user
+                        }).then(response => {
+                            if (response.data.success) {
+                                this.$message({
+                                    message: response.data.message,
+                                    type: 'success'
+                                });
+                                window.location.href = '/dams-war/home.html';
+                            } else {
+                                this.$message.error(response.data.message);
+                            }
+                        })
+                            .catch(error => {
+                                console.error('登录请求错误:', error);
+                                this.$message.error('服务器错误，请稍后重试');
+                            });
+                    }
+                });
+            },
+            // onRegister() {
+            //     window.location.href = '/register';
+            // }
+        }
+    });
+</script>
+
+<style>
+
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        background-image: url('images/login.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: white;
+        color: gray;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .logo-title {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo {
+        height: 50px;
+        margin-right: 30px;
+    }
+
+    .title {
+        font-size: 24px;
+        font-family: "Arial", sans-serif;
+        font-weight: bold;
+        color: gray;
+    }
+
+    .header-right {
+        font-size: 14px;
+    }
+
+    .login-form {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 60px 30px;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 26px;
+    }
+
+    .el-input, .el-button {
+        font-size: 16px;
+    }
+</style>
+
+<style>
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        color: #333;
+    }
+</style>
+
+</body>
+</html>

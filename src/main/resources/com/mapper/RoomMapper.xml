@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.RoomMapper">
+
+    <resultMap id="roomResultMap" type="room">
+        <result property="roomId" column="room_id"/>
+        <result property="dormitoryId" column="dormitory_id"/>
+        <result property="roomNumber" column="room_number"/>
+        <result property="dormitoryName" column="dormitory_name"/>
+    </resultMap>
+
+    <update id="update">
+        update tb_rooms
+        set
+            dormitory_name = #{dormitoryName},
+            capacity = #{capacity},
+            price = #{price},
+            room_number = #{roomNumber},
+            dormitory_id = #{dormitoryId}
+        where
+            room_id = #{roomId};
+    </update>
+
+    <delete id="deleteByIds">
+        delete from tb_rooms where room_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectTotalCountByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from tb_rooms
+        <where>
+            <if test="dormitoryName != null and dormitoryName != '' ">
+                and dormitory_name like #{dormitoryName}
+            </if>
+            <if test="capacity != null">
+                and capacity = #{room.capacity}
+            </if>
+            <if test="price != null">
+                and price = #{price}
+            </if>
+            <if test="roomNumber != null and roomNumber != '' ">
+                and roomNumber like #{roomNumber}
+            </if>
+            <if test="dormitoryId != null">
+                and dormitoryId = #{dormitoryId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPageAndCondition" resultMap="roomResultMap">
+        select *
+        from tb_rooms
+        <where>
+            <if test="room.dormitoryName != null and room.dormitoryName != '' ">
+                and dormitory_name like #{room.dormitoryName}
+            </if>
+            <if test="room.capacity != null">
+                and capacity = #{room.capacity}
+            </if>
+            <if test="room.price != null">
+                and price = #{room.price}
+            </if>
+            <if test="room.roomNumber != null and room.roomNumber != '' ">
+                and roomNumber like #{room.roomNumber}
+            </if>
+            <if test="room.dormitoryId != null">
+                and dormitoryId = #{room.dormitoryId}
+            </if>
+        </where>
+        limit #{begin}, #{size}
+    </select>
+
+</mapper>

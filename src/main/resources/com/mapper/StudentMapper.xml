@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.StudentMapper">
+
+    <resultMap id="studentResultMap" type="student">
+        <result property="studentId" column="student_id"/>
+        <result property="dormitoryId" column="dormitory_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="dormitoryName" column="dormitory_name"/>
+        <result property="roomNumber" column="room_number"/>
+        <result property="group" column="class"/>
+    </resultMap>
+
+    <select id="selectByPageAndCondition" resultMap="studentResultMap">
+        select *
+        from tb_students
+        <where>
+            <if test="student.name != null and student.name != ''">
+                and name like  #{student.name}
+            </if>
+            <if test="student.gender != null and student.gender != '' ">
+                and gender like #{student.gender}
+            </if>
+            <if test="student.ethnicity != null and student.ethnicity != ''">
+                and ethnicity = #{student.ethnicity}
+            </if>
+            <if test="student.major != null and student.major != ''">
+                and major = #{student.major}
+            </if>
+            <if test="student.group != null and student.group != ''">
+                and class = #{student.group}
+            </if>
+            <if test="student.dormitoryName != null and student.dormitoryName !='' ">
+                and dormitoryName = #{student.dormitoryName}
+            </if>
+            <if test="student.roomNumber != null and student.roomNumber != '' ">
+                and roomNumber = #{student.roomNumber}
+            </if>
+        </where>
+        limit #{begin}, #{size}
+    </select>
+
+    <select id="selectTotalCountByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from tb_students
+        <where>
+            <if test="name != null and name != ''">
+                and name like  #{name}
+            </if>
+            <if test="gender != null and gender != '' ">
+                and gender like #{gender}
+            </if>
+            <if test="ethnicity != null and ethnicity != ''">
+                and ethnicity like #{ethnicity}
+            </if>
+            <if test="major != null and major != ''">
+                and major like #{major}
+            </if>
+            <if test="group != null and group != ''">
+                and class like #{group}
+            </if>
+            <if test="dormitoryName != null and dormitoryName !='' ">
+                and dormitoryName like #{dormitoryName}
+            </if>
+            <if test="roomNumber != null and roomNumber != '' ">
+                and roomNumber like #{roomNumber}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByIds">
+        delete from tb_students where tb_students.student_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="update">
+        update tb_students
+        set
+            name = #{name},
+            gender = #{gender},
+            ethnicity = #{ethnicity},
+            major = #{major},
+            class = #{group},
+            dormitory_id = #{dormitoryId},
+            dormitory_name = #{dormitoryName},
+            room_number = #{roomNumber},
+            room_id = #{roomId},
+            contact = #{contact}
+        where
+            student_id = #{studentId};
+    </update>
+
+</mapper>
